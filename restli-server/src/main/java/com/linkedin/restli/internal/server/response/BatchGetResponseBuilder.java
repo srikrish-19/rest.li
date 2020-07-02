@@ -177,7 +177,13 @@ public class BatchGetResponseBuilder implements RestLiResponseBuilder<RestLiResp
       }
       Object finalKey = ResponseUtils.translateCanonicalKeyToAlternativeKeyIfNeeded(entity.getKey(), routingResult);
 
-      final DataMap projectedData = RestUtils.projectFields(entity.getValue().data(),
+      DataMap rawData = entity.getValue().data();
+      if (routingResult.getContext().isDefaultValueFillInRequested())
+      {
+        rawData = ResponseUtils.fillInDefaultValues(entity.getValue().schema(), rawData);
+      }
+
+      final DataMap projectedData = RestUtils.projectFields(rawData,
                                                             routingResult.getContext().getProjectionMode(),
                                                             routingResult.getContext().getProjectionMask());
 

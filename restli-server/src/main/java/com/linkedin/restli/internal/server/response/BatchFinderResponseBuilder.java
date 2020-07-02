@@ -19,6 +19,7 @@ package com.linkedin.restli.internal.server.response;
 import com.linkedin.data.DataList;
 import com.linkedin.data.DataMap;
 import com.linkedin.data.collections.CheckedUtil;
+import com.linkedin.data.schema.RecordDataSchema;
 import com.linkedin.data.template.RecordTemplate;
 import com.linkedin.r2.message.Request;
 import com.linkedin.r2.message.timing.FrameworkTimingKeys;
@@ -153,9 +154,22 @@ public class BatchFinderResponseBuilder
     List<AnyRecord> response = new ArrayList<>(elements.size());
     for (int j = 0; j < elements.size(); j++)
     {
-      response.add(new AnyRecord(RestUtils.projectFields(elements.get(j).data(),
-                                                         resourceContext.getProjectionMode(),
-                                                         resourceContext.getProjectionMask())));
+      if (resourceContext.isDefaultValueFillInRequested())
+      {
+        DataMap elementData = elements.get(j).data();
+        RecordDataSchema schema = elements.get(j).schema();
+        DataMap dataWithDefault = ResponseUtils.fillInDefaultValues(schema, elementData);
+        response.add(new AnyRecord(RestUtils.projectFields(dataWithDefault,
+            resourceContext.getProjectionMode(),
+            resourceContext.getProjectionMask())));
+
+      }
+      else
+      {
+        response.add(new AnyRecord(RestUtils.projectFields(elements.get(j).data(),
+            resourceContext.getProjectionMode(),
+            resourceContext.getProjectionMask())));
+      }
     }
     return response;
   }

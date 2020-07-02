@@ -18,6 +18,7 @@ package com.linkedin.restli.internal.server.response;
 
 
 import com.linkedin.data.DataList;
+import com.linkedin.data.DataMap;
 import com.linkedin.data.collections.CheckedUtil;
 import com.linkedin.data.template.RecordTemplate;
 import com.linkedin.r2.message.Request;
@@ -153,8 +154,13 @@ public abstract class CollectionResponseBuilder<D extends RestLiResponseData<? e
         throw new RestLiServiceException(HttpStatus.S_500_INTERNAL_SERVER_ERROR,
             "Unexpected null encountered. Null element inside of a List returned by the resource method: " + routingResult.getResourceMethod());
       }
+      DataMap rawData = entry.data();
+      if (resourceContext.isDefaultValueFillInRequested())
+      {
+        rawData = ResponseUtils.fillInDefaultValues(entry.schema(), rawData);
+      }
       processedElements.add(new AnyRecord(RestUtils
-          .projectFields(entry.data(), resourceContext.getProjectionMode(), resourceContext.getProjectionMask())));
+          .projectFields(rawData, resourceContext.getProjectionMode(), resourceContext.getProjectionMask())));
     }
 
     //Now for custom metadata
