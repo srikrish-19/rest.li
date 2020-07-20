@@ -94,6 +94,9 @@ public class RestLiConfig
   // configuration for whether to validate any type of resource entity keys Ex. path keys or keys in batch request
   private boolean _validateResourceKeys = false;
 
+  // config flag for determine restli server to fill-in default values or not
+  private boolean _fillInDefaultValues = false;
+
   // resource method level configuration
   private RestLiMethodConfig _methodConfig;
 
@@ -551,5 +554,15 @@ public class RestLiConfig
     _validateResourceKeys = validateResourceKeys;
     setMethodConfig(
         new RestLiMethodConfigBuilder(getMethodConfig()).withShouldValidateResourceKeys(_validateResourceKeys).build());
+  }
+
+  public boolean shouldFillInDefaultValues()
+  {
+    return _fillInDefaultValues;
+  }
+
+  public void setFillInDefaultValues(boolean fillInDefaultValues)
+  {
+    _fillInDefaultValues = fillInDefaultValues;
   }
 }
